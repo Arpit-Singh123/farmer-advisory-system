@@ -208,7 +208,7 @@ async function callNvidiaAPI(prompt, targetEl, lang) {
 
     let response;
     try {
-        response = await fetch('farmer-advisory-backend-production.up.railway.app',  {
+        response = await fetch('https://farmer-advisory-backend-production.up.railway.app/api/advisory',  {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
