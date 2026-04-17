@@ -2,29 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Admin Dashboard - Farmer Advisory System">
     <meta name="theme-color" content="#2E7D32">
     <title>Admin Dashboard | Farmer Advisory System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="page-admin">
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden" style="display:none;">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Loading...</p>
+        <p class="loading-text">Loading dashboard...</p>
     </div>
 
-    <!-- Login Section -->
+    <!-- ============= LOGIN SECTION ============= -->
     <div id="loginSection" class="login-container">
         <div class="card login-card">
             <div class="login-header">
-                <div style="font-size:2.5rem;margin-bottom:0.5rem;">🌾</div>
+                <div style="font-size:3rem;margin-bottom:0.75rem;">🌾</div>
                 <h1>Admin Login</h1>
-                <p>Farmer Advisory System</p>
+                <p style="color:var(--text-secondary);">Farmer Advisory System</p>
             </div>
             <div id="loginError" class="alert alert-error hidden">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
                 <span>Invalid username or password</span>
             </div>
             <form id="loginForm" onsubmit="handleLogin(event)">
@@ -38,7 +43,14 @@
                     <input type="password" id="password" name="password" class="form-control"
                         placeholder="Enter password" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn btn-primary" id="loginBtn">Login</button>
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    Login
+                </button>
                 <div class="nav-links mt-2">
                     <a href="index.html" class="nav-link">← Back to Home</a>
                 </div>
@@ -46,30 +58,50 @@
         </div>
     </div>
 
-    <!-- Dashboard Section -->
+    <!-- ============= DASHBOARD SECTION ============= -->
     <div id="dashboardSection" class="hidden">
-        <header class="header">
-            <h1>Admin Dashboard</h1>
-            <p>Farmer Advisory System</p>
-        </header>
-        <main class="container">
 
-            <div class="card flex" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
-                <span id="welcomeText" style="font-weight:600;">Welcome, Admin</span>
-                <div style="display:flex;gap:0.5rem;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-brand">
+                <span class="header-logo">🌾</span>
+                <div>
+                    <h1>Admin Dashboard</h1>
+                    <p>Farmer Advisory System</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="header-nav-btn">← Home</a>
+                <button onclick="loadDashboard()" class="header-nav-btn">↻ Refresh</button>
+                <button onclick="handleLogout()" class="header-nav-btn">Logout</button>
+            </div>
+        </header>
+
+        <div class="container">
+
+            <!-- Welcome bar -->
+            <div class="admin-welcome-bar card" style="margin-top:1.5rem;">
+                <div class="welcome-info">
+                    <div class="welcome-avatar">👤</div>
+                    <div>
+                        <div style="font-weight:700;font-size:1rem;" id="welcomeText">Welcome, Admin</div>
+                        <div style="font-size:0.82rem;color:var(--text-secondary);">Maharashtra Agriculture Department</div>
+                    </div>
+                </div>
+                <div class="admin-actions">
                     <button onclick="clearAllData()" class="btn btn-outline"
-                        style="width:auto;padding:0.5rem 1rem;min-height:auto;font-size:0.875rem;color:#D32F2F;border-color:#D32F2F;">
-                        Clear Data
+                        style="width:auto;padding:0.45rem 1rem;min-height:auto;font-size:0.85rem;color:#C62828;border-color:#C62828;">
+                        🗑 Clear Data
                     </button>
                     <button onclick="handleLogout()" class="btn btn-outline"
-                        style="width:auto;padding:0.5rem 1rem;min-height:auto;font-size:0.875rem;">
+                        style="width:auto;padding:0.45rem 1rem;min-height:auto;font-size:0.85rem;">
                         Logout
                     </button>
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="stats-grid" id="statsGrid">
+            <!-- Stats Grid (2-col mobile → 4-col desktop) -->
+            <div class="stats-grid" id="statsGrid" style="margin-top:0;">
                 <div class="stat-card">
                     <div class="stat-value" id="totalQueries">0</div>
                     <div class="stat-label">Total Queries</div>
@@ -88,32 +120,58 @@
                 </div>
             </div>
 
-            <!-- Queries by Crop -->
-            <div class="card">
-                <h3 class="mb-2">Queries by Crop</h3>
-                <div id="cropStats"><p class="text-center">Loading...</p></div>
+            <!-- Charts (stacked on mobile, 3-col on desktop) -->
+            <div class="charts-grid">
+                <div class="card">
+                    <h3 class="mb-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        By Crop
+                    </h3>
+                    <div id="cropStats"><p style="color:var(--text-secondary);font-size:0.9rem;">Loading...</p></div>
+                </div>
+                <div class="card">
+                    <h3 class="mb-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        By Issue
+                    </h3>
+                    <div id="issueStats"><p style="color:var(--text-secondary);font-size:0.9rem;">Loading...</p></div>
+                </div>
+                <div class="card">
+                    <h3 class="mb-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        By District
+                    </h3>
+                    <div id="districtStats"><p style="color:var(--text-secondary);font-size:0.9rem;">Loading...</p></div>
+                </div>
             </div>
 
-            <!-- Queries by Issue -->
+            <!-- Queries Table -->
             <div class="card">
-                <h3 class="mb-2">Queries by Issue</h3>
-                <div id="issueStats"><p class="text-center">Loading...</p></div>
-            </div>
-
-            <!-- Queries by District -->
-            <div class="card">
-                <h3 class="mb-2">Queries by District</h3>
-                <div id="districtStats"><p class="text-center">Loading...</p></div>
-            </div>
-
-            <!-- Recent Queries Table -->
-            <div class="card">
-                <h3 class="mb-2">Recent Farmer Queries</h3>
+                <h3 class="mb-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    Recent Farmer Queries
+                </h3>
                 <div class="table-container">
                     <table class="data-table" id="queriesTable">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>#</th>
                                 <th>District</th>
                                 <th>Village</th>
                                 <th>Crop</th>
@@ -122,7 +180,7 @@
                             </tr>
                         </thead>
                         <tbody id="queriesTableBody">
-                            <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            <tr><td colspan="6" class="text-center" style="padding:2rem;color:var(--text-secondary);">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -131,8 +189,9 @@
             <div class="nav-links">
                 <a href="index.html" class="nav-link">← Back to Home</a>
             </div>
-        </main>
-    </div>
+
+        </div><!-- /container -->
+    </div><!-- /dashboardSection -->
 
     <footer class="footer">
         <p>Admin Dashboard | Farmer Advisory System</p>

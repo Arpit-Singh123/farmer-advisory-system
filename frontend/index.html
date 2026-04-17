@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Farmer Advisory System for Maharashtra - Get farming advice for your crops">
     <meta name="theme-color" content="#2E7D32">
     <title>Farmer Advisory System | Maharashtra</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="page-index">
 
-    <!-- ===================== LANGUAGE SPLASH SCREEN ===================== -->
+    <!-- ============= LANGUAGE SPLASH SCREEN ============= -->
     <div id="langSplash" class="lang-splash">
         <div class="lang-splash-inner">
             <div class="lang-splash-logo">🌾</div>
@@ -36,7 +36,6 @@
             </div>
         </div>
     </div>
-    <!-- ================================================================= -->
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay hidden" style="display:none;">
@@ -44,153 +43,215 @@
         <p class="loading-text" id="loadingText">Loading...</p>
     </div>
 
-    <!-- Header -->
+    <!-- ============= HEADER ============= -->
     <header class="header">
-        <h1 id="headerTitle">Farmer Advisory System</h1>
-        <p id="headerSubtitle">Maharashtra Agriculture Department</p>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container">
-
-        <!-- Language Selection (inline switcher) -->
-        <div class="card">
-            <h2 id="langSelectLabel" class="text-center mb-2">Select Language / भाषा निवडा</h2>
-            <div class="language-selector">
-                <button class="lang-btn active" data-lang="english" onclick="changeLanguage('english')">English</button>
-                <button class="lang-btn" data-lang="hindi" onclick="changeLanguage('hindi')">हिंदी</button>
-                <button class="lang-btn" data-lang="marathi" onclick="changeLanguage('marathi')">मराठी</button>
+        <div class="header-brand">
+            <span class="header-logo">🌾</span>
+            <div>
+                <h1 id="headerTitle">Farmer Advisory System</h1>
+                <p id="headerSubtitle">Maharashtra Agriculture Department</p>
             </div>
         </div>
-
-        <!-- Error Message -->
-        <div id="errorMessage" class="alert alert-error hidden">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="15" y1="9" x2="9" y2="15"></line>
-                <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-            <span id="errorText">Please fill all required fields</span>
+        <!-- Desktop header nav (only visible on tablet+) -->
+        <div class="header-right">
+            <a href="admin.html" class="header-nav-btn" id="adminLink">Admin Login</a>
+            <a href="tel:1551" class="header-nav-btn">📞 1551</a>
         </div>
+    </header>
 
-        <!-- Query Form -->
-        <div class="card">
-            <h2 id="formTitle" class="mb-2">Enter Your Details</h2>
+    <!-- ============= MAIN ============= -->
+    <main class="container">
 
-            <form id="advisoryForm" onsubmit="submitForm(event)">
+        <!-- Desktop: two-column wrapper -->
+        <div class="page-layout">
 
-                <!-- District Selection -->
-                <div class="form-group">
-                    <label for="district" id="districtLabel">District <span class="required">*</span></label>
-                    <select id="district" name="district" class="form-control" required>
-                        <option value="">-- Select District --</option>
-                        <option value="Ahmednagar">Ahmednagar</option>
-                        <option value="Akola">Akola</option>
-                        <option value="Amravati">Amravati</option>
-                        <option value="Aurangabad">Aurangabad</option>
-                        <option value="Beed">Beed</option>
-                        <option value="Bhandara">Bhandara</option>
-                        <option value="Buldhana">Buldhana</option>
-                        <option value="Chandrapur">Chandrapur</option>
-                        <option value="Dhule">Dhule</option>
-                        <option value="Gadchiroli">Gadchiroli</option>
-                        <option value="Gondia">Gondia</option>
-                        <option value="Hingoli">Hingoli</option>
-                        <option value="Jalgaon">Jalgaon</option>
-                        <option value="Jalna">Jalna</option>
-                        <option value="Kolhapur">Kolhapur</option>
-                        <option value="Latur">Latur</option>
-                        <option value="Mumbai City">Mumbai City</option>
-                        <option value="Mumbai Suburban">Mumbai Suburban</option>
-                        <option value="Nagpur">Nagpur</option>
-                        <option value="Nanded">Nanded</option>
-                        <option value="Nandurbar">Nandurbar</option>
-                        <option value="Nashik">Nashik</option>
-                        <option value="Osmanabad">Osmanabad</option>
-                        <option value="Palghar">Palghar</option>
-                        <option value="Parbhani">Parbhani</option>
-                        <option value="Pune">Pune</option>
-                        <option value="Raigad">Raigad</option>
-                        <option value="Ratnagiri">Ratnagiri</option>
-                        <option value="Sangli">Sangli</option>
-                        <option value="Satara">Satara</option>
-                        <option value="Sindhudurg">Sindhudurg</option>
-                        <option value="Solapur">Solapur</option>
-                        <option value="Thane">Thane</option>
-                        <option value="Wardha">Wardha</option>
-                        <option value="Washim">Washim</option>
-                        <option value="Yavatmal">Yavatmal</option>
-                    </select>
+            <!-- LEFT / MAIN COLUMN -->
+            <div class="main-col">
+
+                <!-- Language Selector Card -->
+                <div class="card">
+                    <h2 id="langSelectLabel" class="text-center mb-2">Select Language / भाषा निवडा</h2>
+                    <div class="language-selector">
+                        <button class="lang-btn active" data-lang="english" onclick="changeLanguage('english')">English</button>
+                        <button class="lang-btn" data-lang="hindi"   onclick="changeLanguage('hindi')">हिंदी</button>
+                        <button class="lang-btn" data-lang="marathi" onclick="changeLanguage('marathi')">मराठी</button>
+                    </div>
                 </div>
 
-                <!-- Village Input -->
-                <div class="form-group">
-                    <label for="village" id="villageLabel">Village Name <span class="required">*</span></label>
-                    <input type="text" id="village" name="village" class="form-control"
-                        placeholder="Enter your village name" required maxlength="200">
-                </div>
-
-                <!-- Soil Type Selection -->
-                <div class="form-group">
-                    <label for="soilType" id="soilTypeLabel">Soil Type <span class="required">*</span></label>
-                    <select id="soilType" name="soilType" class="form-control" required>
-                        <option value="">-- Select Soil Type --</option>
-                        <option value="Black Soil">Black Soil (काळी माती)</option>
-                        <option value="Red Soil">Red Soil (लाल माती)</option>
-                        <option value="Laterite Soil">Laterite Soil (जांभा माती)</option>
-                        <option value="Sandy Soil">Sandy Soil (वाळूकामय माती)</option>
-                    </select>
-                </div>
-
-                <!-- Crop Selection -->
-                <div class="form-group">
-                    <label for="crop" id="cropLabel">Crop <span class="required">*</span></label>
-                    <select id="crop" name="crop" class="form-control" required>
-                        <option value="">-- Select Crop --</option>
-                        <option value="Rice">Rice (भात / धान)</option>
-                        <option value="Wheat">Wheat (गहू / गेहूं)</option>
-                        <option value="Sugarcane">Sugarcane (ऊस / गन्ना)</option>
-                        <option value="Cotton">Cotton (कापूस / कपास)</option>
-                        <option value="Soybean">Soybean (सोयाबीन)</option>
-                        <option value="Banana">Banana (केळी / केला)</option>
-                        <option value="Mango">Mango (आंबा / आम)</option>
-                        <option value="Vegetables">Vegetables (भाजीपाला / सब्जी)</option>
-                    </select>
-                </div>
-
-                <!-- Issue Selection -->
-                <div class="form-group">
-                    <label for="issue" id="issueLabel">Issue / Problem <span class="required">*</span></label>
-                    <select id="issue" name="issue" class="form-control" required>
-                        <option value="">-- Select Issue --</option>
-                        <option value="Pest Attack">Pest Attack (कीड हल्ला)</option>
-                        <option value="Disease Symptoms">Disease Symptoms (रोग लक्षणे)</option>
-                        <option value="Fertilizer Advice">Fertilizer Advice (खत सल्ला)</option>
-                        <option value="Irrigation Problem">Irrigation Problem (सिंचन समस्या)</option>
-                        <option value="Weather Concern">Weather Concern (हवामान चिंता)</option>
-                    </select>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" id="submitBtn" class="btn btn-primary">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 2L11 13"></path>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                <!-- Error Message -->
+                <div id="errorMessage" class="alert alert-error hidden">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
                     </svg>
-                    <span id="submitBtnText">Get Advisory</span>
-                </button>
+                    <span id="errorText">Please fill all required fields</span>
+                </div>
 
-            </form>
-        </div>
+                <!-- Query Form Card -->
+                <div class="card">
+                    <h2 id="formTitle" class="mb-2">Enter Your Details</h2>
 
-        <!-- Navigation Links -->
-        <div class="nav-links">
-            <a href="admin.html" class="nav-link" id="adminLink">Admin Login</a>
-        </div>
+                    <form id="advisoryForm" onsubmit="submitForm(event)">
+
+                        <!-- District + Village (2-col on desktop) -->
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="district" id="districtLabel">District <span class="required">*</span></label>
+                                <select id="district" name="district" class="form-control" required>
+                                    <option value="">-- Select District --</option>
+                                    <option value="Ahmednagar">Ahmednagar</option>
+                                    <option value="Akola">Akola</option>
+                                    <option value="Amravati">Amravati</option>
+                                    <option value="Aurangabad">Aurangabad</option>
+                                    <option value="Beed">Beed</option>
+                                    <option value="Bhandara">Bhandara</option>
+                                    <option value="Buldhana">Buldhana</option>
+                                    <option value="Chandrapur">Chandrapur</option>
+                                    <option value="Dhule">Dhule</option>
+                                    <option value="Gadchiroli">Gadchiroli</option>
+                                    <option value="Gondia">Gondia</option>
+                                    <option value="Hingoli">Hingoli</option>
+                                    <option value="Jalgaon">Jalgaon</option>
+                                    <option value="Jalna">Jalna</option>
+                                    <option value="Kolhapur">Kolhapur</option>
+                                    <option value="Latur">Latur</option>
+                                    <option value="Mumbai City">Mumbai City</option>
+                                    <option value="Mumbai Suburban">Mumbai Suburban</option>
+                                    <option value="Nagpur">Nagpur</option>
+                                    <option value="Nanded">Nanded</option>
+                                    <option value="Nandurbar">Nandurbar</option>
+                                    <option value="Nashik">Nashik</option>
+                                    <option value="Osmanabad">Osmanabad</option>
+                                    <option value="Palghar">Palghar</option>
+                                    <option value="Parbhani">Parbhani</option>
+                                    <option value="Pune">Pune</option>
+                                    <option value="Raigad">Raigad</option>
+                                    <option value="Ratnagiri">Ratnagiri</option>
+                                    <option value="Sangli">Sangli</option>
+                                    <option value="Satara">Satara</option>
+                                    <option value="Sindhudurg">Sindhudurg</option>
+                                    <option value="Solapur">Solapur</option>
+                                    <option value="Thane">Thane</option>
+                                    <option value="Wardha">Wardha</option>
+                                    <option value="Washim">Washim</option>
+                                    <option value="Yavatmal">Yavatmal</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="village" id="villageLabel">Village Name <span class="required">*</span></label>
+                                <input type="text" id="village" name="village" class="form-control"
+                                    placeholder="Enter your village name" required maxlength="200">
+                            </div>
+                        </div>
+
+                        <!-- Soil + Crop (2-col on desktop) -->
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="soilType" id="soilTypeLabel">Soil Type <span class="required">*</span></label>
+                                <select id="soilType" name="soilType" class="form-control" required>
+                                    <option value="">-- Select Soil Type --</option>
+                                    <option value="Black Soil">Black Soil (काळी माती)</option>
+                                    <option value="Red Soil">Red Soil (लाल माती)</option>
+                                    <option value="Laterite Soil">Laterite Soil (जांभा माती)</option>
+                                    <option value="Sandy Soil">Sandy Soil (वाळूकामय माती)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="crop" id="cropLabel">Crop <span class="required">*</span></label>
+                                <select id="crop" name="crop" class="form-control" required>
+                                    <option value="">-- Select Crop --</option>
+                                    <option value="Rice">Rice (भात / धान)</option>
+                                    <option value="Wheat">Wheat (गहू / गेहूं)</option>
+                                    <option value="Sugarcane">Sugarcane (ऊस / गन्ना)</option>
+                                    <option value="Cotton">Cotton (कापूस / कपास)</option>
+                                    <option value="Soybean">Soybean (सोयाबीन)</option>
+                                    <option value="Banana">Banana (केळी / केला)</option>
+                                    <option value="Mango">Mango (आंबा / आम)</option>
+                                    <option value="Vegetables">Vegetables (भाजीपाला / सब्जी)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Issue (full width) -->
+                        <div class="form-group">
+                            <label for="issue" id="issueLabel">Issue / Problem <span class="required">*</span></label>
+                            <select id="issue" name="issue" class="form-control" required>
+                                <option value="">-- Select Issue --</option>
+                                <option value="Pest Attack">Pest Attack (कीड हल्ला)</option>
+                                <option value="Disease Symptoms">Disease Symptoms (रोग लक्षणे)</option>
+                                <option value="Fertilizer Advice">Fertilizer Advice (खत सल्ला)</option>
+                                <option value="Irrigation Problem">Irrigation Problem (सिंचन समस्या)</option>
+                                <option value="Weather Concern">Weather Concern (हवामान चिंता)</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" id="submitBtn" class="btn btn-primary btn-full">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2L11 13"></path>
+                                <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                            </svg>
+                            <span id="submitBtnText">Get Advisory</span>
+                        </button>
+
+                    </form>
+                </div>
+
+                <!-- Admin link (mobile only — desktop uses header) -->
+                <div class="nav-links" style="display:flex;" id="mobileAdminLink">
+                    <a href="admin.html" class="nav-link">Admin Login</a>
+                </div>
+
+            </div><!-- /main-col -->
+
+            <!-- RIGHT / SIDE COLUMN (desktop only) -->
+            <aside class="side-col info-panel">
+
+                <div class="info-panel-hero">
+                    <div class="hero-icon">🌱</div>
+                    <h3>Smart Crop Advisory</h3>
+                    <p>AI-powered farming guidance tailored for Maharashtra's small & marginal farmers — in your language.</p>
+                </div>
+
+                <div class="info-tip">
+                    <h4>How it works</h4>
+                    <div class="tip-item">
+                        <span class="tip-icon">1️⃣</span>
+                        <span>Select your district, village, soil type and crop from the form.</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">2️⃣</span>
+                        <span>Choose the problem you are facing with your crop.</span>
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">3️⃣</span>
+                        <span>Click <strong>Get Advisory</strong> — the AI will generate step-by-step advice instantly.</span>
+                    </div>
+                </div>
+
+                <div class="info-tip">
+                    <h4>Quick tips</h4>
+                    <div class="tip-item"><span class="tip-icon">🌿</span><span>Black soil retains moisture best for cotton & soybean.</span></div>
+                    <div class="tip-item"><span class="tip-icon">💧</span><span>Check soil moisture before irrigation to save water.</span></div>
+                    <div class="tip-item"><span class="tip-icon">🔬</span><span>Early pest detection prevents 40–60% crop loss.</span></div>
+                </div>
+
+                <div class="helpline-card">
+                    <a href="tel:1551">
+                        <div class="hl-number">1551</div>
+                        <div class="hl-label">Kisan Call Centre — Free helpline, 24×7</div>
+                    </a>
+                </div>
+
+            </aside>
+
+        </div><!-- /page-layout -->
 
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <p id="footerText">Farmer Advisory System | Maharashtra Agriculture Department</p>
         <p id="helplineText">Helpline: <a href="tel:1551">1551</a></p>

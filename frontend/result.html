@@ -2,21 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Farmer Advisory System - Your farming advisory results">
     <meta name="theme-color" content="#2E7D32">
     <title>Advisory Result | Farmer Advisory System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="page-result">
 
     <!-- Header -->
     <header class="header">
-        <h1 id="headerTitle">Farming Advisory</h1>
-        <p id="headerSubtitle">Your Personalized Advice</p>
+        <div class="header-brand">
+            <span class="header-logo">🌾</span>
+            <div>
+                <h1 id="headerTitle">Farming Advisory</h1>
+                <p id="headerSubtitle">Your Personalized Advice</p>
+            </div>
+        </div>
+        <div class="header-right">
+            <button onclick="goBack()" class="header-nav-btn">← New Query</button>
+            <button onclick="printAdvisory()" class="header-nav-btn">🖨 Print</button>
+        </div>
     </header>
 
-    <!-- Main Content -->
     <main class="container">
 
         <!-- Error Message -->
@@ -29,85 +37,97 @@
             <span id="errorText">An error occurred. Please try again.</span>
         </div>
 
-        <!-- Query Summary Card -->
-        <div class="card" id="summaryCard">
-            <h2 id="summaryTitle" class="mb-2">Your Query Details</h2>
-            <div class="result-section">
-                <p class="result-label" id="districtResultLabel">District</p>
-                <p class="result-value" id="districtResult">-</p>
-            </div>
-            <div class="result-section">
-                <p class="result-label" id="villageResultLabel">Village</p>
-                <p class="result-value" id="villageResult">-</p>
-            </div>
-            <div class="result-section">
-                <p class="result-label" id="soilResultLabel">Soil Type</p>
-                <p class="result-value" id="soilResult">-</p>
-            </div>
-            <div class="result-section">
-                <p class="result-label" id="cropResultLabel">Crop</p>
-                <p class="result-value" id="cropResult">-</p>
-            </div>
-            <div class="result-section">
-                <p class="result-label" id="issueResultLabel">Issue</p>
-                <p class="result-value" id="issueResult">-</p>
-            </div>
-        </div>
+        <!-- Desktop: two-column layout -->
+        <div class="page-layout">
 
-        <!-- Advisory Result Card -->
-        <div class="card" id="advisoryCard">
-            <div class="advisory-box">
-                <h3 id="advisoryTitle">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
-                        <path d="M2 17L12 22L22 17"></path>
-                        <path d="M2 12L12 17L22 12"></path>
-                    </svg>
-                    <span>AI Farming Advisory</span>
-                </h3>
-                <div id="advisoryText" class="advisory-text">
-                    <span class="ai-thinking">
-                        <span class="dot-pulse"></span>
-                        Generating advisory...
-                    </span>
+            <!-- LEFT: Query Summary (sticky on desktop) -->
+            <div class="summary-col">
+
+                <div class="card" id="summaryCard">
+                    <h2 id="summaryTitle" class="mb-2">Your Query Details</h2>
+                    <div class="result-section">
+                        <p class="result-label" id="districtResultLabel">District</p>
+                        <p class="result-value" id="districtResult">-</p>
+                    </div>
+                    <div class="result-section">
+                        <p class="result-label" id="villageResultLabel">Village</p>
+                        <p class="result-value" id="villageResult">-</p>
+                    </div>
+                    <div class="result-section">
+                        <p class="result-label" id="soilResultLabel">Soil Type</p>
+                        <p class="result-value" id="soilResult">-</p>
+                    </div>
+                    <div class="result-section">
+                        <p class="result-label" id="cropResultLabel">Crop</p>
+                        <p class="result-value" id="cropResult">-</p>
+                    </div>
+                    <div class="result-section">
+                        <p class="result-label" id="issueResultLabel">Issue</p>
+                        <p class="result-value" id="issueResult">-</p>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="card">
-            <button onclick="goBack()" class="btn btn-primary mb-2" id="newQueryBtn">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                <span id="newQueryBtnText">Submit New Query</span>
-            </button>
-            <button onclick="printAdvisory()" class="btn btn-outline" id="printBtn">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                    <rect x="6" y="14" width="12" height="8"></rect>
-                </svg>
-                <span id="printBtnText">Print Advisory</span>
-            </button>
-        </div>
+                <!-- Action buttons -->
+                <div class="card">
+                    <button onclick="goBack()" class="btn btn-primary btn-full mb-2" id="newQueryBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <span id="newQueryBtnText">Submit New Query</span>
+                    </button>
+                    <button onclick="printAdvisory()" class="btn btn-outline btn-full" id="printBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        <span id="printBtnText">Print Advisory</span>
+                    </button>
+                </div>
 
-        <!-- Helpline Info -->
-        <div class="card text-center">
-            <h3 id="helpTitle">Need More Help?</h3>
-            <p id="helpText">Contact your local Krishi Vigyan Kendra or call the helpline.</p>
-            <a href="tel:1551" class="btn btn-secondary mt-2" id="callBtn">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                </svg>
-                <span>Call Helpline: 1551</span>
-            </a>
-        </div>
+                <!-- Helpline -->
+                <div class="card text-center">
+                    <h3 id="helpTitle">Need More Help?</h3>
+                    <p id="helpText" style="font-size:0.9rem;">Contact your local Krishi Vigyan Kendra or call the helpline.</p>
+                    <a href="tel:1551" class="btn btn-secondary btn-full mt-2" id="callBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                        <span>Call Helpline: 1551</span>
+                    </a>
+                </div>
+
+            </div><!-- /summary-col -->
+
+            <!-- RIGHT: Advisory (main content) -->
+            <div class="advisory-col">
+
+                <div class="card" id="advisoryCard">
+                    <div class="advisory-box">
+                        <h3 id="advisoryTitle">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
+                                <path d="M2 17L12 22L22 17"></path>
+                                <path d="M2 12L12 17L22 12"></path>
+                            </svg>
+                            <span>AI Farming Advisory</span>
+                        </h3>
+                        <div id="advisoryText" class="advisory-text">
+                            <span class="ai-thinking">
+                                <span class="dot-pulse"></span>
+                                Generating advisory...
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /advisory-col -->
+
+        </div><!-- /page-layout -->
 
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <p>Farmer Advisory System | Maharashtra Agriculture Department</p>
     </footer>

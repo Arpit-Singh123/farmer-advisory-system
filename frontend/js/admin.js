@@ -42,15 +42,40 @@ function handleLogout() {
     if (errorEl) errorEl.classList.add('hidden');
 }
 
+const BACKEND_URL = 'https://farmer-advisory-backend-production.up.railway.app';
+
 // =====================================================
-// DASHBOARD DATA (from localStorage)
+// DASHBOARD DATA — loads from MySQL (all devices) ✅
 // =====================================================
 
-function loadDashboard() {
-    const queries = JSON.parse(localStorage.getItem('allQueries') || '[]');
+async function loadDashboard() {
+    // Show loading state
+    document.getElementById('totalQueries').textContent   = '...';
+    document.getElementById('totalDistricts').textContent = '...';
+    document.getElementById('totalCrops').textContent     = '...';
+    document.getElementById('totalIssues').textContent    = '...';
 
+    let queries = [];
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/queries/all`);
+        const result   = await response.json();
+
+        if (result.success) {
+            queries = result.data;
+        }
+    } catch (e) {
+        console.warn('Could not load from database, falling back to localStorage:', e);
+        // Fallback to localStorage if backend is unreachable
+        queries = JSON.parse(localStorage.getItem('allQueries') || '[]');
+    }
+
+    renderDashboard(queries);
+}
+
+function renderDashboard(queries) {
     // Stats
-    document.getElementById('totalQueries').textContent   = queries.length;
+    document.getElementById('totalQueries').textContent = queries.length;
 
     const districts = [...new Set(queries.map(q => q.district).filter(Boolean))];
     const crops     = [...new Set(queries.map(q => q.crop).filter(Boolean))];
@@ -60,17 +85,30 @@ function loadDashboard() {
     document.getElementById('totalCrops').textContent     = crops.length;
     document.getElementById('totalIssues').textContent    = issues.length;
 
-    // Build stat maps
-    const cropStats     = buildStatMap(queries, 'crop');
-    const issueStats    = buildStatMap(queries, 'issue');
-    const districtStats = buildStatMap(queries, 'district');
-
-    displayStatsList('cropStats',     cropStats);
-    displayStatsList('issueStats',    issueStats);
-    displayStatsList('districtStats', districtStats);
+    // Charts
+    displayStatsList('cropStats',     buildStatMap(queries, 'crop'));
+    displayStatsList('issueStats',    buildStatMap(queries, 'issue'));
+    displayStatsList('districtStats', buildStatMap(queries, 'district'));
 
     // Table
     displayQueriesTable(queries);
+}
+
+// =====================================================
+// CLEAR DATA — deletes from MySQL ✅
+// =====================================================
+
+async function clearAllData() {
+    if (!confirm('Are you sure you want to delete ALL query records from the database? This cannot be undone.')) return;
+
+    try {
+        await fetch(`${BACKEND_URL}/api/queries/clear`, { method: 'DELETE' });
+        localStorage.removeItem('allQueries');
+        loadDashboard();
+        alert('All records deleted successfully.');
+    } catch (e) {
+        alert('Error clearing data. Please try again.');
+    }
 }
 
 function buildStatMap(queries, field) {

@@ -246,10 +246,13 @@ const fullText =
 }
 
 // =====================================================
-// SAVE QUERY FOR ADMIN DASHBOARD
+// SAVE QUERY TO MYSQL DATABASE (via backend API)
 // =====================================================
 
-function saveQueryToStorage(data, advisory) {
+const BACKEND_URL = 'https://farmer-advisory-backend-production.up.railway.app';
+
+async function saveQueryToStorage(data, advisory) {
+    // Always save locally too (fallback if network fails)
     try {
         const queries = JSON.parse(localStorage.getItem('allQueries') || '[]');
         queries.unshift({
@@ -263,10 +266,29 @@ function saveQueryToStorage(data, advisory) {
             advisory:  advisory,
             createdAt: new Date().toISOString()
         });
-        // Keep only last 100 queries
         localStorage.setItem('allQueries', JSON.stringify(queries.slice(0, 100)));
     } catch (e) {
-        console.warn('Could not save query to storage:', e);
+        console.warn('localStorage save failed:', e);
+    }
+
+    // Save to MySQL via backend
+    try {
+        await fetch(`${BACKEND_URL}/api/queries/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                district: data.district,
+                village:  data.village,
+                soilType: data.soilType,
+                crop:     data.crop,
+                issue:    data.issue,
+                language: data.language,
+                advisory: advisory
+            })
+        });
+        console.log('Query saved to MySQL database');
+    } catch (e) {
+        console.warn('MySQL save failed (query still in localStorage):', e);
     }
 }
 
