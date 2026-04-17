@@ -9,7 +9,7 @@
  */
 
 const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'farm@2024';
+const ADMIN_PASS = 'admin123';
 
 // =====================================================
 // LOGIN / LOGOUT
