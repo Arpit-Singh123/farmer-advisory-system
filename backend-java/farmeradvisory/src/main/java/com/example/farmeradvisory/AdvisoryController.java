@@ -3,68 +3,89 @@ package com.example.farmeradvisory;
 import org.springframework.web.bind.annotation.*;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @CrossOrigin(origins = "*")
 public class AdvisoryController {
 
     @PostMapping("/api/advisory")
-    public String getAdvisory(@RequestBody Map<String, String> body) throws Exception {
+    public String getAdvisory(@RequestBody Map<String, String> body) {
 
-        String prompt = body.get("prompt");
+        try {
+            String prompt = body.get("prompt");
 
-        HttpURLConnection conn = (HttpURLConnection) URI.create("https://integrate.api.nvidia.com/v1/chat/completions").toURL().openConnection();
+            // ✅ Null check
+            if (prompt == null || prompt.isEmpty()) {
+                return "{\"error\":\"Prompt is missing\"}";
+            }
 
-        conn.setConnectTimeout(15000);
-conn.setReadTimeout(30000);
+            HttpURLConnection conn = (HttpURLConnection) URI
+                    .create("https://integrate.api.nvidia.com/v1/chat/completions")
+                    .toURL()
+                    .openConnection();
 
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("Authorization", "Bearer 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");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setDoOutput(true);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(30000);
 
-        // ✅ escape prompt properly
-        String safePrompt = prompt
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "");
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
 
-        // ✅ UPDATED JSON (Moonshot model)
-        String json = "{"
-        + "\"model\":\"moonshotai/kimi-k2.5\","
-        + "\"messages\":[{\"role\":\"user\",\"content\":\"" + safePrompt + "\"}],"
-        + "\"max_tokens\":400,"
-        + "\"temperature\":1.0,"
-        + "\"top_p\":1.0,"
-        + "\"chat_template_kwargs\":{\"thinking\":false}"
-        + "}";
+            // ⚠️ IMPORTANT: replace with env variable later
+            conn.setRequestProperty("Authorization", "Bearer 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");
 
-        // send request
-        OutputStream os = conn.getOutputStream();
-        os.write(json.getBytes("utf-8"));
-        os.flush();
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
 
-        // handle response
-        InputStream is;
-        if (conn.getResponseCode() >= 400) {
-            is = conn.getErrorStream();
-        } else {
-            is = conn.getInputStream();
+            // escape prompt
+            String safePrompt = prompt
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "");
+
+            String json = "{"
+                    + "\"model\":\"moonshotai/kimi-k2.5\","
+                    + "\"messages\":[{\"role\":\"user\",\"content\":\"" + safePrompt + "\"}],"
+                    + "\"max_tokens\":400,"
+                    + "\"temperature\":1.0,"
+                    + "\"top_p\":1.0,"
+                    + "\"chat_template_kwargs\":{\"thinking\":false}"
+                    + "}";
+
+            OutputStream os = conn.getOutputStream();
+            os.write(json.getBytes(StandardCharsets.UTF_8));
+            os.flush();
+
+            InputStream is = null;
+            int status = conn.getResponseCode();
+
+            if (status >= 400) {
+                is = conn.getErrorStream();
+            } else {
+                is = conn.getInputStream();
+            }
+
+            if (is == null) {
+                return "{\"error\":\"No response from API\"}";
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String line;
+            StringBuilder response = new StringBuilder();
+
+            while ((line = br.readLine()) != null) {
+                response.append(line.trim());
+            }
+
+            System.out.println("MOONSHOT RESPONSE: " + response.toString());
+
+            return response.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\":\"Backend error: " + e.getMessage() + "\"}";
         }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "utf-8"));
-        String line;
-        StringBuilder response = new StringBuilder();
-
-        while ((line = br.readLine()) != null) {
-            response.append(line.trim());
-        }
-
-        System.out.println("MOONSHOT RESPONSE: " + response.toString());
-
-        return response.toString();
     }
 }
