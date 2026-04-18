@@ -16,6 +16,9 @@ public class AdvisoryController {
 
         HttpURLConnection conn = (HttpURLConnection) URI.create("https://integrate.api.nvidia.com/v1/chat/completions").toURL().openConnection();
 
+        conn.setConnectTimeout(15000);
+conn.setReadTimeout(30000);
+
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Authorization", "Bearer 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");
@@ -33,7 +36,7 @@ public class AdvisoryController {
         String json = "{"
         + "\"model\":\"moonshotai/kimi-k2.5\","
         + "\"messages\":[{\"role\":\"user\",\"content\":\"" + safePrompt + "\"}],"
-        + "\"max_tokens\":1024,"
+        + "\"max_tokens\":400,"
         + "\"temperature\":1.0,"
         + "\"top_p\":1.0,"
         + "\"chat_template_kwargs\":{\"thinking\":false}"
