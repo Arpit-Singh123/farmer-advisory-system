@@ -2,37 +2,27 @@
  * =====================================================
  * Farmer Advisory System - Main JavaScript
  * =====================================================
- * FIXES:
- * 1. Uses Anthropic Claude API (fast, reliable, no CORS issues)
- * 2. Splash screen uses sessionStorage so it shows every new browser session
- * 3. Added 30-second timeout with clear error message
- * 4. Saves queries to localStorage for Admin dashboard
- * =====================================================
  */
 
-// =====================================================
-// CONFIGURATION — Replace with your Anthropic API key
-// =====================================================
-// Current language
+// ── Single BACKEND_URL at the top — never declare this again ──
+const BACKEND_URL = 'https://farmer-advisory-backend-production.up.railway.app';
+
 let currentLanguage = localStorage.getItem('selectedLanguage') || 'english';
 
 // =====================================================
 // SPLASH SCREEN
-// FIX: Use sessionStorage instead of localStorage so
-// the splash shows again on every new browser session.
 // =====================================================
 
 function selectSplashLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('selectedLanguage', lang);
-    sessionStorage.setItem('languageChosen', 'true'); // ← KEY FIX
+    sessionStorage.setItem('languageChosen', 'true');
 
     const splash = document.getElementById('langSplash');
     if (splash) {
         splash.classList.add('hidden');
         setTimeout(() => { splash.style.display = 'none'; }, 450);
     }
-
     changeLanguage(lang);
 }
 
@@ -48,16 +38,13 @@ function changeLanguage(lang) {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
 
-    if (typeof applyTranslations === 'function') {
-        applyTranslations(lang);
-    }
-
-    updateDropdownTranslations(lang);   
+    if (typeof applyTranslations === 'function') applyTranslations(lang);
+    updateDropdownTranslations(lang);
     updateDistrictTranslations(lang);
 }
 
 // =====================================================
-// UTILITY: LOADING & ERROR
+// LOADING & ERROR
 // =====================================================
 
 function showLoading(message) {
@@ -90,9 +77,8 @@ function hideError() {
 
 function buildFarmerPrompt(data) {
     let langName = 'English';
-
-if (data.language === 'hindi') langName = 'Hindi';
-if (data.language === 'marathi') langName = 'Marathi';
+    if (data.language === 'hindi')   langName = 'Hindi';
+    if (data.language === 'marathi') langName = 'Marathi';
 
     return `You are an expert agricultural advisor for Maharashtra, India, helping small and marginal farmers.
 
@@ -129,29 +115,27 @@ async function submitForm(event) {
     hideError();
 
     const formData = {
-        district:  document.getElementById('district').value.trim(),
-        village:   document.getElementById('village').value.trim(),
-        soilType:  document.getElementById('soilType').value,
-        crop:      document.getElementById('crop').value,
-        issue:     document.getElementById('issue').value,
-        language:  currentLanguage
+        district: document.getElementById('district').value.trim(),
+        village:  document.getElementById('village').value.trim(),
+        soilType: document.getElementById('soilType').value,
+        crop:     document.getElementById('crop').value,
+        issue:    document.getElementById('issue').value,
+        language: currentLanguage
     };
 
     if (!formData.district || !formData.village || !formData.soilType ||
-        !formData.crop     || !formData.issue) {
+        !formData.crop || !formData.issue) {
         showError(getTranslation('fillAllFields', currentLanguage));
         return;
     }
 
-    // Store form data for the result page
     localStorage.setItem('farmerQuery', JSON.stringify(formData));
     localStorage.removeItem('advisoryResult');
-
     window.location.href = 'result.html';
 }
 
 // =====================================================
-// RESULT PAGE: AI CALL WITH STREAMING
+// RESULT PAGE
 // =====================================================
 
 async function displayResult() {
@@ -163,30 +147,34 @@ async function displayResult() {
 
     if (typeof applyTranslations === 'function') applyTranslations(lang);
 
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val || '-';
+    };
     set('districtResult', data.district);
     set('villageResult',  data.village);
     set('soilResult',     data.soilType);
     set('cropResult',     data.crop);
     set('issueResult',    data.issue);
 
-    const prompt    = buildFarmerPrompt(data);
     const advisoryEl = document.getElementById('advisoryText');
-
     if (advisoryEl) {
         advisoryEl.innerHTML = `<span class="ai-thinking"><span class="dot-pulse"></span> ${getTranslation('generatingAdvisory', lang)}</span>`;
     }
 
     try {
-        const advisory = await callNvidiaAPI(prompt, advisoryEl, lang);
+        // STEP 1: Call backend → AI generates advisory
+        const advisory = await callNvidiaAPI(data, advisoryEl, lang);
 
-        // Save to localStorage for admin dashboard
-        saveQueryToStorage(data, advisory);
+        // STEP 2: Save to MySQL via /api/queries/save
+        await saveQueryToStorage(data, advisory);
 
     } catch (err) {
         console.error('AI Error:', err);
-        const errMsg = err.message && err.message.includes('timeout')
-            ? getTranslation('timeoutError', lang) || 'Request timed out. Please try again.'
+        // FIX: correctly detect AbortError from AbortController timeout
+        const isTimeout = err.name === 'AbortError';
+        const errMsg = isTimeout
+            ? 'Request timed out. The server may be waking up — please wait 30 seconds and try again.'
             : getTranslation('networkError', lang);
 
         if (advisoryEl) advisoryEl.textContent = errMsg;
@@ -194,29 +182,22 @@ async function displayResult() {
     }
 }
 
-/**
- * Calls the Anthropic Claude API.
- * FIX: Uses fetch with a 30-second timeout AbortController.
- * Since browser CORS blocks Anthropic API directly, this works
- * when served via Live Server or any local HTTP server.
- *
- * NOTE: For production, move the API call to a backend proxy.
- */
-async function callNvidiaAPI(prompt, targetEl, lang) {
+// =====================================================
+// CALL BACKEND → NVIDIA AI
+// =====================================================
+
+async function callNvidiaAPI(data, targetEl, lang) {
     const controller = new AbortController();
     const timeoutId  = setTimeout(() => controller.abort(), 90000);
 
     let response;
     try {
-        response = await fetch('https://farmer-advisory-backend-production.up.railway.app/api/advisory',  {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                prompt: prompt
-            }),
-            signal: controller.signal
+        // FIX: uses BACKEND_URL constant, not a hardcoded string
+        response = await fetch(BACKEND_URL + '/api/advisory', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ prompt: buildFarmerPrompt(data) }),
+            signal:  controller.signal
         });
     } finally {
         clearTimeout(timeoutId);
@@ -227,16 +208,14 @@ async function callNvidiaAPI(prompt, targetEl, lang) {
         throw new Error(`API error ${response.status}: ${errText}`);
     }
 
-    const text = await response.text();
-console.log("RAW RESPONSE:", text);
+    const responseText = await response.text();
+    // FIX: renamed from 'data' to 'parsed' to avoid shadowing the outer 'data' parameter
+    const parsed = JSON.parse(responseText);
 
-const data = JSON.parse(text);
-
-const fullText =
-    data.choices?.[0]?.message?.content ||
-    data.choices?.[0]?.text ||
-    data.choices?.[0]?.delta?.content ||
-    '';
+    const fullText =
+        parsed.choices?.[0]?.message?.content ||
+        parsed.choices?.[0]?.text             ||
+        parsed.choices?.[0]?.delta?.content   || '';
 
     if (targetEl) {
         targetEl.textContent = fullText || getTranslation('networkError', lang);
@@ -246,13 +225,11 @@ const fullText =
 }
 
 // =====================================================
-// SAVE QUERY TO MYSQL DATABASE (via backend API)
+// SAVE TO MYSQL via /api/queries/save
 // =====================================================
 
-const BACKEND_URL = 'https://farmer-advisory-backend-production.up.railway.app';
-
 async function saveQueryToStorage(data, advisory) {
-    // Always save locally too (fallback if network fails)
+    // Local backup first
     try {
         const queries = JSON.parse(localStorage.getItem('allQueries') || '[]');
         queries.unshift({
@@ -271,10 +248,10 @@ async function saveQueryToStorage(data, advisory) {
         console.warn('localStorage save failed:', e);
     }
 
-    // Save to MySQL via backend
+    // Save to MySQL via QueryController
     try {
-        await fetch(`${BACKEND_URL}/api/queries/save`, {
-            method: 'POST',
+        const res = await fetch(BACKEND_URL + '/api/queries/save', {
+            method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 district: data.district,
@@ -286,9 +263,12 @@ async function saveQueryToStorage(data, advisory) {
                 advisory: advisory
             })
         });
-        console.log('Query saved to MySQL database');
+        const result = await res.json();
+        if (result.success) {
+            console.log('Saved to MySQL. ID:', result.id || 'ok');
+        }
     } catch (e) {
-        console.warn('MySQL save failed (query still in localStorage):', e);
+        console.warn('MySQL save failed (localStorage backup intact):', e.message);
     }
 }
 
@@ -296,39 +276,26 @@ async function saveQueryToStorage(data, advisory) {
 // HELPERS
 // =====================================================
 
-function escapeHtml(str) {
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>');
-}
-
 function goBack() {
     localStorage.removeItem('advisoryResult');
     window.location.href = 'index.html';
 }
 
-function printAdvisory() {
-    window.print();
-}
+function printAdvisory() { window.print(); }
 
 // =====================================================
-// PAGE INITIALIZATION
+// PAGE INIT
 // =====================================================
 
 document.addEventListener('DOMContentLoaded', function () {
     hideLoading();
 
     const splash = document.getElementById('langSplash');
-
     if (splash) {
-        // FIX: Use sessionStorage so splash shows on every new browser tab/session
         const alreadyChosen = sessionStorage.getItem('languageChosen');
         if (alreadyChosen) {
             splash.style.display = 'none';
-            const saved = localStorage.getItem('selectedLanguage') || 'english';
-            changeLanguage(saved);
+            changeLanguage(localStorage.getItem('selectedLanguage') || 'english');
         } else {
             splash.classList.remove('hidden');
         }
@@ -336,53 +303,40 @@ document.addEventListener('DOMContentLoaded', function () {
         const saved = localStorage.getItem('selectedLanguage') || 'english';
         currentLanguage = saved;
         if (typeof applyTranslations === 'function') applyTranslations(saved);
-        updateDropdownTranslations(currentLanguage);
-        updateDistrictTranslations(currentLanguage);
+        updateDropdownTranslations(saved);
+        updateDistrictTranslations(saved);
     }
 });
 
+// =====================================================
+// DROPDOWN TRANSLATIONS
+// =====================================================
 
 function updateDropdownTranslations(lang) {
     const selects = ['soilType', 'crop', 'issue'];
-
     selects.forEach(id => {
         const select = document.getElementById(id);
-        if (!select) return;
-
+        if (!select || typeof fieldTranslations === 'undefined') return;
         Array.from(select.options).forEach(option => {
             const value = option.value;
             if (!value || !fieldTranslations[value]) return;
-
             const t = fieldTranslations[value];
-
-            if (lang === 'english') {
-                option.textContent = `${value} (${t.hindi} / ${t.marathi})`;
-            } else if (lang === 'hindi') {
-                option.textContent = `${value} (${t.hindi})`;
-            } else if (lang === 'marathi') {
-                option.textContent = `${value} (${t.marathi})`;
-            }
+            if (lang === 'english')      option.textContent = `${value} (${t.hindi} / ${t.marathi})`;
+            else if (lang === 'hindi')   option.textContent = `${value} (${t.hindi})`;
+            else if (lang === 'marathi') option.textContent = `${value} (${t.marathi})`;
         });
     });
 }
 
-
 function updateDistrictTranslations(lang) {
     const select = document.getElementById('district');
-    if (!select) return;
-
+    if (!select || typeof districtTranslations === 'undefined') return;
     Array.from(select.options).forEach(option => {
         const value = option.value;
         if (!value || !districtTranslations[value]) return;
-
         const t = districtTranslations[value];
-
-        if (lang === 'english') {
-            option.textContent = `${value} (${t.hindi} / ${t.marathi})`;
-        } else if (lang === 'hindi') {
-            option.textContent = `${value} (${t.hindi})`;
-        } else if (lang === 'marathi') {
-            option.textContent = `${value} (${t.marathi})`;
-        }
+        if (lang === 'english')      option.textContent = `${value} (${t.hindi} / ${t.marathi})`;
+        else if (lang === 'hindi')   option.textContent = `${value} (${t.hindi})`;
+        else if (lang === 'marathi') option.textContent = `${value} (${t.marathi})`;
     });
 }
