@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.net.URI;
 
 @RestController
 @CrossOrigin
@@ -14,8 +15,7 @@ public class AdvisoryController {
 
         String prompt = body.get("prompt");
 
-        URL url = new URL("https://integrate.api.nvidia.com/v1/chat/completions");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) URI.create("https://integrate.api.nvidia.com/v1/chat/completions").toURL().openConnection();
 
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
