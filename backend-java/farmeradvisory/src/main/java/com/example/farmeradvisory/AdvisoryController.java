@@ -4,10 +4,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.net.URI;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class AdvisoryController {
 
     @PostMapping("/api/advisory")
